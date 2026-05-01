@@ -102,7 +102,12 @@ check_selftest() {
 wait_selftest() {
   local label="$1" secs="$2"
   echo ">>> $label: sleeping ${secs}s (~$((secs / 60))m)"
-  sleep "$secs"
+  local elapsed=0
+  while [[ $elapsed -lt $secs ]]; do
+    sleep 600
+    elapsed=$((elapsed + 600))
+    dd if="$DRIVE" of=/dev/null bs=512 count=1 iflag=direct 2>/dev/null || true
+  done
   check_selftest "$label"
 }
 
